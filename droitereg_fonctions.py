@@ -5,6 +5,141 @@ import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt6 import QtWidgets
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+import io
+import os
+from PyQt6.QtWidgets import QFileDialog
+
+def print(self):
+    # Print le graphe et toutes les données du tableWidget dans un fichier PDF    
+    # Demander à l'utilisateur où sauvegarder le PDF
+    fileName, _ = QFileDialog.getSaveFileName(
+        None,  
+        "Enregistrer l'annexe",
+        os.path.expanduser("~/Desktop"),
+        "Fichiers PDF (*.pdf)"
+    )
+    
+    if not fileName:
+        return  
+    
+    if not fileName.endswith('.pdf'):
+        fileName += '.pdf'
+    
+    # Créer un document PDF
+    doc = SimpleDocTemplate(
+        fileName,
+        pagesize=A4,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=72,
+        bottomMargin=72
+    )
+    
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Ajouter un titre
+    title = Paragraph("Annexe de Régression Linéaire", styles['Title'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+    
+    # Capturer le graphique
+    graph_layout = self.ui_main_window.graph_layout
+    if graph_layout and graph_layout.layout() and graph_layout.layout().count() > 0:
+        canvas_item = graph_layout.layout().itemAt(0).widget()
+        if isinstance(canvas_item, FigureCanvas):
+            # Obtenir la figure et la sauvegarder dans un buffer
+            fig = canvas_item.figure
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+            buf.seek(0)
+            
+            # Convertir le buffer en image pour ReportLab
+            from reportlab.lib.utils import ImageReader
+            img = ImageReader(buf)
+            
+            # Calculer les dimensions pour garder le ratio
+            img_width = doc.width * 0.8  
+            img_height = img_width * (fig.get_figheight() / fig.get_figwidth())
+            
+            # Ajouter le graphique au PDF comme une image
+            elements.append(Paragraph("Graphique de régression:", styles['Heading2']))
+            elements.append(Spacer(1, 6))
+            from reportlab.platypus import Image
+            elements.append(Image(buf, width=img_width, height=img_height))
+            elements.append(Spacer(1, 12))
+    
+    # Obtenir les données du tableau
+    table_widget = self.ui_main_window.tableWidget_data
+    
+    if table_widget:
+        elements.append(Paragraph("Données:", styles['Heading2']))
+        elements.append(Spacer(1, 6))
+        
+        # Créer une liste pour stocker les données
+        table_data = []
+        
+        # Créer l'en-tête combiné (label + unité)
+        combined_headers = []
+        
+        for col in range(table_widget.columnCount()):
+            header_item = table_widget.item(0, col)
+            unit_item = table_widget.item(1, col)
+            
+            header = header_item.text() if header_item else f"Colonne {col+1}"
+            unit = unit_item.text() if unit_item else ""
+            
+            # Combiner le label et l'unité
+            combined_header = f"{header} ({unit})" if unit else header
+            combined_headers.append(combined_header)
+        
+        table_data.append(combined_headers)
+        
+        # Récupérer les données
+        for row in range(2, table_widget.rowCount()):
+            row_data = []
+            empty_row = True
+            
+            for col in range(table_widget.columnCount()):
+                item = table_widget.item(row, col)
+                value = item.text() if item else ""
+                row_data.append(value)
+                if value:
+                    empty_row = False
+            
+            if not empty_row:
+                table_data.append(row_data)
+        
+        pdf_table = Table(table_data)
+        
+        table_style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue),  # First row blue
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('BACKGROUND', (0, 1), (-1, 1), colors.white)  # Second row red
+        ])
+        
+        for i in range(2, len(table_data), 2):
+            table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgrey)
+        
+        pdf_table.setStyle(table_style)
+        elements.append(pdf_table)
+    
+    # Ajouter les commentaires à la fin seulement s'ils existent
+    commentaires = self.ui_main_window.textEdit_commentaires.toPlainText().strip()
+    if commentaires:
+        elements.append(Spacer(1, 30))
+        elements.append(Paragraph("Commentaires:", styles['Heading2']))
+        elements.append(Paragraph(commentaires, styles['Normal']))
+    
+    # Générer le PDF
+    doc.build(elements)
 
 def droitereg(self):
     # Récupération des données
@@ -21,6 +156,12 @@ def droitereg(self):
     if data.item(0, 1): label_y = data.item(0, 1)
     if data.item(1, 0): unite_x = data.item(1, 0)
     if data.item(1, 1): unite_y = data.item(1, 1)
+
+    # Compléter les labels et unités des colonnes 2 et 3
+    data.setItem(0, 2, QtWidgets.QTableWidgetItem(f"{label_y.text()} corrigé"))
+    data.setItem(0, 3, QtWidgets.QTableWidgetItem("Écart"))
+    data.setItem(1, 2, QtWidgets.QTableWidgetItem(f"{unite_y.text()}"))
+    data.setItem(1, 3, QtWidgets.QTableWidgetItem(f"{unite_y.text()}"))
 
 
     # Récupération des valeurs de X et Y
@@ -67,30 +208,39 @@ def droitereg(self):
     ax = fig.add_subplot(111)
     
     # Plot data
-    ax.scatter(x, y, color='dodgerblue', label=f'y={a:.2f}x+{b:.2f}\nR²={r_carre:.2f}\nx=(y-b)/a')
+    ax.scatter(x, y, color='dodgerblue', label=f'y={a:.3f}x+{b:.3f}\nR²={r_carre:.3f}\nx=(y-{b:.3f})/{a:.3f}')
     ax.plot(x, y_reg, color='crimson')
     ax.set_title(f'Régression Linéaire de {label_y.text()} en fonction de {label_x.text()}')
     ax.set_xlabel(f'{label_x.text()} ({unite_x.text()})')
     ax.set_ylabel(f'{label_y.text()} ({unite_y.text()})')
     ax.legend()
     ax.grid()
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('dimgray')
+    fig.subplots_adjust(top=0.91, bottom=0.11, left=0.06, right=0.95, hspace=0.2, wspace=0.3)
+
     
     # Clear existing layout and add new canvas
     layout = QtWidgets.QVBoxLayout(self.ui_main_window.graph_layout)
     layout.addWidget(canvas)
 
-
-
 def zero(self):
     # Efface les données
     data = self.ui_main_window.tableWidget_data
+    commentaires = self.ui_main_window.textEdit_commentaires
     data.clearContents()
+    commentaires.clear()
 
     # Efface le graphe
     layout = self.ui_main_window.graph_layout.layout()
     if layout:
-        for i in reversed(range(layout.count())):
-            layout.itemAt(i).widget().setParent(None)
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+        # Remove the old layout
+        QtWidgets.QWidget().setLayout(layout)
 
 def adjustTableWidgetSize(tableWidget_data):
     # Calculer la taille optimale de la table
@@ -109,7 +259,88 @@ def adjustTableWidgetSize(tableWidget_data):
 
     # Ajouter des marges si nécessaire
     table_width += 76  # Pour les bords et le défilement horizontal
-    table_height += 27  # Pour les bords et le défilement vertical
+    table_height += 38  # Pour les bords et le défilement vertical
 
     # Redimensionner le widget de la table
     tableWidget_data.setFixedSize(table_width, table_height)
+
+    # Bloquer les colonnes 2 et 3 pour ne pas pouvoir écrire dedans
+
+def remplissage(self):
+    # La fonction remplissage permet de remplir automatiquement les colonnes 0 et 1 avec des valeurs prédéfinis pour tester le programme
+    # Compléter les labels et unités des colonnes 0 et 1
+    data = self.ui_main_window.tableWidget_data
+
+    data.setItem(0, 1, QtWidgets.QTableWidgetItem("Tension"))
+    data.setItem(0, 0, QtWidgets.QTableWidgetItem("Force"))
+    data.setItem(1, 1, QtWidgets.QTableWidgetItem("V"))
+    data.setItem(1, 0, QtWidgets.QTableWidgetItem("kN"))
+                 
+    # Remplissage des données
+    data.setItem(2, 0, QtWidgets.QTableWidgetItem("0"))
+    data.setItem(2, 1, QtWidgets.QTableWidgetItem("0.5"))
+    data.setItem(3, 0, QtWidgets.QTableWidgetItem("1"))
+    data.setItem(3, 1, QtWidgets.QTableWidgetItem("1.4"))
+    data.setItem(4, 0, QtWidgets.QTableWidgetItem("2"))
+    data.setItem(4, 1, QtWidgets.QTableWidgetItem("2.6"))
+    data.setItem(5, 0, QtWidgets.QTableWidgetItem("3"))
+    data.setItem(5, 1, QtWidgets.QTableWidgetItem("3.5"))
+    data.setItem(6, 0, QtWidgets.QTableWidgetItem("4"))
+    data.setItem(6, 1, QtWidgets.QTableWidgetItem("4.6"))
+
+    # Ajout d'un commentaire
+    commentaires = self.ui_main_window.textEdit_commentaires
+    commentaires.setPlainText("Très bon étlaonnage Maixme !")
+
+def theme(self):
+    self.setStyleSheet("""
+        QWidget {
+            background-color: #2E3440;
+            color: #D8DEE9;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QPushButton {
+            background-color: #4C566A;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QPushButton:hover {
+            background-color: #81A1C1;
+        }
+        QTableWidget {
+            background-color: #3B4252;
+            color: #D8DEE9;
+            gridline-color: #4C566A;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QTableWidget::item {
+            padding: 5px;
+        }
+        QTableWidget::item:selected {
+            background-color: #FFC107;
+        }
+        QHeaderView::section:horizontal {
+            gridline-color: #4C566A;        
+            padding: 5px;
+            background-color: #4C566A;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QHeaderView::section:horizontal:checked {
+            background-color: #5E81AC;
+        }
+        QHeaderView::section:horizontal:pressed {
+            background-color: #81A1C1;
+        }
+        QToolTip {
+            background-color: #4C566A;
+            color: #D8DEE9;
+            border: 1px solid #D8DEE9;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+    """)

@@ -161,10 +161,23 @@
     <property name="geometry">
      <rect>
       <x>500</x>
-      <y>190</y>
+      <y>250</y>
       <width>851</width>
       <height>491</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_remplissage">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>20</y>
+      <width>191</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remplissage</string>
     </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">
