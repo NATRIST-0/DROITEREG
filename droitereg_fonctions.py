@@ -208,7 +208,7 @@ def droitereg(self):
     ax = fig.add_subplot(111)
     
     # Plot data
-    ax.scatter(x, y, color='dodgerblue', label=f'y={a:.3f}x+{b:.3f}\nR²={r_carre:.3f}\nx=(y-{b:.3f})/{a:.3f}')
+    ax.scatter(x, y, color='dodgerblue', label=f'y={a:.3f}x+{b:.3f}\nR²={r_carre:.3f}')
     ax.plot(x, y_reg, color='crimson')
     ax.set_title(f'Régression Linéaire de {label_y.text()} en fonction de {label_x.text()}')
     ax.set_xlabel(f'{label_x.text()} ({unite_x.text()})')
@@ -290,9 +290,11 @@ def remplissage(self):
 
     # Ajout d'un commentaire
     commentaires = self.ui_main_window.textEdit_commentaires
-    commentaires.setPlainText("Très bon étlaonnage Maixme !")
+    commentaires.setPlainText("Mesures effectuées avec multimètre EC1469")
 
-def theme(self):
+
+# Theme for dark mode
+def dark_theme(self):
     self.setStyleSheet("""
         QWidget {
             background-color: #2E3440;
@@ -344,3 +346,63 @@ def theme(self):
             font-size: 12px;
         }
     """)
+
+# Theme for light mode
+def light_theme(self):
+    self.setStyleSheet("""
+        QWidget {
+            background-color: #FFFFFF;  /* Fond blanc */
+            color: #000000;            /* Texte noir */
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QPushButton {
+            background-color: #007BFF;  /* Boutons bleus */
+            color: #FFFFFF;             /* Texte blanc */
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QPushButton:hover {
+            background-color: #0056B3;  /* Bleu plus foncé au survol */
+        }
+        QTableWidget {
+            background-color: #FFFFFF;  /* Fond blanc */
+            color: #000000;            /* Texte noir */
+            gridline-color: #DDDDDD;    /* Bordures grises */
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QTableWidget::item {
+            padding: 5px;
+        }
+        QTableWidget::item:selected {
+            background-color: #FFC107;  /* Jaune pour les éléments sélectionnés */
+        }
+        QHeaderView::section:horizontal {
+            background-color: #E9ECEF;  /* En-têtes gris clair */
+            color: #000000;             /* Texte noir */
+            padding: 5px;
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+        QHeaderView::section:horizontal:checked {
+            background-color: #B3D7FF;  /* Bleu pastel pour les en-têtes sélectionnés */
+        }
+        QToolTip {
+            background-color: #FFFFFF;  /* Fond blanc */
+            color: #000000;            /* Texte noir */
+            border: 1px solid #CCCCCC; /* Bordure grise */
+            font-family: 'Segoe UI';
+            font-size: 12px;
+        }
+    """)
+
+def light_mode(self):
+    if self.is_dark_theme:
+        light_theme(self)
+        self.is_dark_theme = False
+    else:
+        dark_theme(self)
+        self.is_dark_theme = True

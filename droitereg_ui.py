@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'droitereg_ui_remplissage_auto.ui'
+# Form implementation generated from reading ui file 'droitereg_ui.ui'
 #
 # Created by: PyQt6 UI code generator 6.8.0
 #
@@ -12,11 +12,11 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1344, 955)
+        MainWindow.resize(1455, 955)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tableWidget_data = QtWidgets.QTableWidget(parent=self.centralwidget)
-        self.tableWidget_data.setGeometry(QtCore.QRect(12, 12, 601, 861))
+        self.tableWidget_data.setGeometry(QtCore.QRect(12, 22, 601, 861))
         self.tableWidget_data.setObjectName("tableWidget_data")
         self.tableWidget_data.setColumnCount(4)
         self.tableWidget_data.setRowCount(22)
@@ -74,13 +74,18 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget_data.setHorizontalHeaderItem(3, item)
         self.graph_layout = QtWidgets.QWidget(parent=self.centralwidget)
-        self.graph_layout.setGeometry(QtCore.QRect(500, 250, 851, 491))
+        self.graph_layout.setGeometry(QtCore.QRect(500, 260, 851, 491))
         self.graph_layout.setObjectName("graph_layout")
-        self.pushButton_remplissage = QtWidgets.QPushButton(parent=self.centralwidget)
-        self.pushButton_remplissage.setGeometry(QtCore.QRect(950, 20, 191, 61))
-        self.pushButton_remplissage.setObjectName("pushButton_remplissage")
+        self.label_signature = QtWidgets.QLabel(parent=self.centralwidget)
+        self.label_signature.setGeometry(QtCore.QRect(10, 740, 151, 20))
+        font = QtGui.QFont()
+        font.setPointSize(5)
+        font.setKerning(True)
+        self.label_signature.setFont(font)
+        self.label_signature.setToolTip("")
+        self.label_signature.setObjectName("label_signature")
         self.layoutWidget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.layoutWidget.setGeometry(QtCore.QRect(500, 20, 421, 219))
+        self.layoutWidget.setGeometry(QtCore.QRect(500, 30, 421, 219))
         self.layoutWidget.setObjectName("layoutWidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.layoutWidget)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -104,6 +109,13 @@ class Ui_MainWindow(object):
         self.textEdit_commentaires.setEnabled(True)
         self.textEdit_commentaires.setObjectName("textEdit_commentaires")
         self.verticalLayout_2.addWidget(self.textEdit_commentaires)
+        self.pushButton_light_mode = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.pushButton_light_mode.setGeometry(QtCore.QRect(930, 30, 41, 41))
+        self.pushButton_light_mode.setText("")
+        self.pushButton_light_mode.setObjectName("pushButton_light_mode")
+        self.pushButton_remplissage = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.pushButton_remplissage.setGeometry(QtCore.QRect(930, 90, 191, 61))
+        self.pushButton_remplissage.setObjectName("pushButton_remplissage")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -164,8 +176,9 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Sortie corrigé"))
         item = self.tableWidget_data.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "ΔY"))
-        self.pushButton_remplissage.setText(_translate("MainWindow", "Remplissage"))
+        self.label_signature.setText(_translate("MainWindow", "By : Tristan Gayrard 👍😎"))
         self.pushButton_droitereg.setText(_translate("MainWindow", "Régression Linéaire"))
         self.pushButton_zero.setText(_translate("MainWindow", "Zero"))
         self.pushButton_print.setText(_translate("MainWindow", "Imprimer"))
         self.label.setText(_translate("MainWindow", "Commentaires :"))
+        self.pushButton_remplissage.setText(_translate("MainWindow", "Remplissage"))

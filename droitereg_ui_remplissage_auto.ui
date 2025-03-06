@@ -231,6 +231,28 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="label_signature">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>730</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>5</pointsize>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string extracomment="coucou"/>
+    </property>
+    <property name="text">
+     <string>By : Tristan Gayrard 👍😎</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
