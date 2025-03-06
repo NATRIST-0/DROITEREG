@@ -113,9 +113,6 @@ class Ui_MainWindow(object):
         self.pushButton_light_mode.setGeometry(QtCore.QRect(930, 30, 41, 41))
         self.pushButton_light_mode.setText("")
         self.pushButton_light_mode.setObjectName("pushButton_light_mode")
-        self.pushButton_remplissage = QtWidgets.QPushButton(parent=self.centralwidget)
-        self.pushButton_remplissage.setGeometry(QtCore.QRect(930, 90, 191, 61))
-        self.pushButton_remplissage.setObjectName("pushButton_remplissage")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -181,4 +178,3 @@ class Ui_MainWindow(object):
         self.pushButton_zero.setText(_translate("MainWindow", "Zero"))
         self.pushButton_print.setText(_translate("MainWindow", "Imprimer"))
         self.label.setText(_translate("MainWindow", "Commentaires :"))
-        self.pushButton_remplissage.setText(_translate("MainWindow", "Remplissage"))

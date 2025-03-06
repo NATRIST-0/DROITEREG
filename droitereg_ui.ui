@@ -253,19 +253,6 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_remplissage">
-    <property name="geometry">
-     <rect>
-      <x>930</x>
-      <y>90</y>
-      <width>191</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Remplissage</string>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources/>

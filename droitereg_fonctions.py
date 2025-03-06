@@ -299,9 +299,9 @@ def adjustTableWidgetSize(tableWidget_data):
 
     # Bloquer les colonnes 2 et 3 pour ne pas pouvoir écrire dedans
 
+"""
 def remplissage(self):
     # La fonction remplissage permet de remplir automatiquement les colonnes 0 et 1 avec des valeurs prédéfinis pour tester le programme
-    # Compléter les labels et unités des colonnes 0 et 1
     data = self.ui_main_window.tableWidget_data
 
     data.setItem(0, 1, QtWidgets.QTableWidgetItem("Tension"))
@@ -324,7 +324,7 @@ def remplissage(self):
     # Ajout d'un commentaire
     commentaires = self.ui_main_window.textEdit_commentaires
     commentaires.setPlainText("Mesures effectuées avec multimètre EC1469")
-
+"""
 
 # Theme for dark mode
 def dark_theme(self):

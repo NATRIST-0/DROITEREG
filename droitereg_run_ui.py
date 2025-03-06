@@ -41,7 +41,7 @@ class Window(QMainWindow):
         self.ui_main_window.pushButton_zero.clicked.connect(lambda: df.zero(self))
         self.ui_main_window.pushButton_print.clicked.connect(lambda: df.print(self))
         self.ui_main_window.pushButton_light_mode.clicked.connect(lambda: df.light_mode(self))
-        self.ui_main_window.pushButton_remplissage.clicked.connect(lambda: df.remplissage(self))
+        #self.ui_main_window.pushButton_remplissage.clicked.connect(lambda: df.remplissage(self))
 
 
 if __name__ == "__main__":
