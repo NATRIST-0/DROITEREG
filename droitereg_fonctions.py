@@ -14,6 +14,16 @@ import os
 from PyQt6.QtWidgets import QFileDialog
 
 def print(self):
+    # Vérifier si le tableau est vide
+    if self.ui_main_window.tableWidget_data.rowCount() < 3 or self.ui_main_window.tableWidget_data.columnCount() < 2:
+        QtWidgets.QMessageBox.warning(self, "Erreur", "Le tableau est vide. Remplissez-le avant de générer un PDF.")
+        return
+
+    # Vérifier si le graphique est vide
+    if not self.ui_main_window.graph_layout.layout() or self.ui_main_window.graph_layout.layout().count() == 0:
+        QtWidgets.QMessageBox.warning(self, "Erreur", "Aucun graphique n'est affiché. Effectuez une régression linéaire avant de générer un PDF.")
+        return
+
     # Print le graphe et toutes les données du tableWidget dans un fichier PDF    
     # Demander à l'utilisateur où sauvegarder le PDF
     fileName, _ = QFileDialog.getSaveFileName(
@@ -141,10 +151,33 @@ def print(self):
     # Générer le PDF
     doc.build(elements)
 
+def zero(self):
+    # Efface les données
+    data = self.ui_main_window.tableWidget_data
+    commentaires = self.ui_main_window.textEdit_commentaires
+    data.clearContents()
+    commentaires.clear()
+
+    # Efface le graphe
+    layout = self.ui_main_window.graph_layout.layout()
+    if layout:
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+        # Remove the old layout
+        QtWidgets.QWidget().setLayout(layout)
+
 def droitereg(self):
     # Récupération des données
     data = self.ui_main_window.tableWidget_data
-    
+
+    # Vérifier si le tableau a au moins 2 colonnes
+    if data.columnCount() < 2:
+        QtWidgets.QMessageBox.warning(self, "Erreur", "Le tableau doit avoir au moins 2 colonnes (X et Y).")
+        return
+
     # Initialize default values
     label_x = QtWidgets.QTableWidgetItem("X")
     label_y = QtWidgets.QTableWidgetItem("Y")
@@ -163,7 +196,6 @@ def droitereg(self):
     data.setItem(1, 2, QtWidgets.QTableWidgetItem(f"{unite_y.text()}"))
     data.setItem(1, 3, QtWidgets.QTableWidgetItem(f"{unite_y.text()}"))
 
-
     # Récupération des valeurs de X et Y
     x = []
     y = []
@@ -176,14 +208,26 @@ def droitereg(self):
                 x.append(float(item_x.text()))
                 y.append(float(item_y.text()))
             except ValueError:
-                continue
-    x = np.array(x)
-    y = np.array(y)
+                QtWidgets.QMessageBox.warning(self, "Erreur", f"Les données à la ligne {i+1-2} ne sont pas des nombres valides.")
+                return
+            
+    # Convertir les listes en tableaux NumPy
+    x = np.array(x, dtype=np.float64)  # Conversion explicite en tableau NumPy
+    y = np.array(y, dtype=np.float64)  # Conversion explicite en tableau NumPy
+
+    # Vérifier s'il y a assez de points pour une régression linéaire
+    if len(x) < 2:
+        QtWidgets.QMessageBox.warning(self, "Erreur", "Au moins deux points de données valides sont nécessaires pour effectuer une régression linéaire.")
+        return
 
     # Régression linéaire
-    a, b = np.polyfit(x, y, 1)
-    y_reg = a * x + b
-    r_carre=1-np.sum((y-y_reg)**2)/np.sum((y-np.mean(y))**2)
+    try:
+        a, b = np.polyfit(x, y, 1)
+        y_reg = a * x + b
+        r_carre = 1 - np.sum((y - y_reg) ** 2) / np.sum((y - np.mean(y)) ** 2)
+    except Exception as e:
+        QtWidgets.QMessageBox.critical(self, "Erreur", f"Une erreur s'est produite lors du calcul de la régression linéaire : {str(e)}")
+        return
 
     # Remplissage des données Y corrigées et Écart, ycorigées recalculé avec y=mx+p, Ycor colonne 2 et Écart colonne 3
     for i in range(2, data.rowCount()):
@@ -194,53 +238,42 @@ def droitereg(self):
                 y_cor = a * x_val + b
                 y_val = float(data.item(i, 1).text()) if data.item(i, 1) and data.item(i, 1).text() else 0
                 ecart = y_val - y_cor
-                
+
                 data.setItem(i, 2, QtWidgets.QTableWidgetItem(f"{y_cor:.2f}"))
                 data.setItem(i, 3, QtWidgets.QTableWidgetItem(f"{ecart:.2f}"))
             except ValueError:
+                QtWidgets.QMessageBox.warning(self, "Erreur", f"Les données à la ligne {i+1-2} ne sont pas des nombres valides.")
                 continue
 
-
     # Affichage dans le graphe graph_layout QWidget    
-    # Create figure and canvas
-    fig = Figure()
-    canvas = FigureCanvas(fig)
-    ax = fig.add_subplot(111)
-    
-    # Plot data
-    ax.scatter(x, y, color='dodgerblue', label=f'y={a:.3f}x+{b:.3f}\nR²={r_carre:.3f}')
-    ax.plot(x, y_reg, color='crimson')
-    ax.set_title(f'Régression Linéaire de {label_y.text()} en fonction de {label_x.text()}')
-    ax.set_xlabel(f'{label_x.text()} ({unite_x.text()})')
-    ax.set_ylabel(f'{label_y.text()} ({unite_y.text()})')
-    ax.legend()
-    ax.grid()
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('dimgray')
-    fig.subplots_adjust(top=0.91, bottom=0.11, left=0.06, right=0.95, hspace=0.2, wspace=0.3)
+    try:
+        # Create figure and canvas
+        fig = Figure()
+        canvas = FigureCanvas(fig)
+        ax = fig.add_subplot(111)
 
-    
-    # Clear existing layout and add new canvas
-    layout = QtWidgets.QVBoxLayout(self.ui_main_window.graph_layout)
-    layout.addWidget(canvas)
+        # Plot data
+        ax.scatter(x, y, color='dodgerblue', label=f'y={a:.4f}x+{b:.4f}\nR²={r_carre:.4f}')
+        ax.plot(x, y_reg, color='crimson')
+        ax.set_title(f'Régression Linéaire de {label_y.text()} en fonction de {label_x.text()}')
+        ax.set_xlabel(f'{label_x.text()} ({unite_x.text()})')
+        ax.set_ylabel(f'{label_y.text()} ({unite_y.text()})')
+        ax.legend()
+        ax.grid()
+        fig.patch.set_linewidth(2)
+        fig.patch.set_edgecolor('dimgray')
+        fig.subplots_adjust(top=0.91, bottom=0.11, left=0.06, right=0.95, hspace=0.2, wspace=0.3)
 
-def zero(self):
-    # Efface les données
-    data = self.ui_main_window.tableWidget_data
-    commentaires = self.ui_main_window.textEdit_commentaires
-    data.clearContents()
-    commentaires.clear()
-
-    # Efface le graphe
-    layout = self.ui_main_window.graph_layout.layout()
-    if layout:
+        # Clear existing layout and add new canvas
+        layout = QtWidgets.QVBoxLayout(self.ui_main_window.graph_layout)
         while layout.count():
             item = layout.takeAt(0)
             widget = item.widget()
             if widget:
                 widget.deleteLater()
-        # Remove the old layout
-        QtWidgets.QWidget().setLayout(layout)
+        layout.addWidget(canvas)
+    except Exception as e:
+        QtWidgets.QMessageBox.critical(self, "Erreur", f"Une erreur s'est produite lors de l'affichage du graphique : {str(e)}")
 
 def adjustTableWidgetSize(tableWidget_data):
     # Calculer la taille optimale de la table
