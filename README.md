@@ -34,7 +34,7 @@
 
 ## 💻 User Interface
 
-<img width="100%" alt="UI Screenshot" src="https://github.com/user-attachments/assets/0f28cd29-60ba-4763-b0f4-a610b0c18433" />
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/bc74e701-f0fd-479d-b202-957492c5a0cf" />
 
 ---
 
