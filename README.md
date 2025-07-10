@@ -9,7 +9,7 @@
 
 ---
 
-## 🧽 Overview
+## Overview
 
 **DROITEREG** is designed to replace traditional Excel-based tools with a faster, clearer, and more standardized interface. It's especially useful in calibration laboratories or for technicians needing to:
 
@@ -20,37 +20,30 @@
 
 ---
 
-## ✨ Features
+## Features
 
-* 📈 **Data Plotting** – Visualize your calibration or measurement data.
-* 🔄 **Unit Conversion** – Automatically convert output values into input units.
-* 📉 **Linear Regression** – Fit and display a regression line with statistics.
-* 📊 **Error Calculation** – Compute and display differences between expected and actual values.
-* 🧾 **PDF Report Generation** – Create and export a professional summary.
-* 🧪 **Example Dataset** – Load an example to guide new users or refresh memory.
-* 🔄 **Data Reset** – Clear and replot new data without restarting the app.
+* **Data Plotting** – Visualize your calibration or measurement data.
+* **Unit Conversion** – Automatically convert output values into input units.
+* **Linear Regression** – Fit and display a regression line with statistics.
+* **Error Calculation** – Compute and display differences between expected and actual values.
+* **PDF Report Generation** – Create and export a professional summary.
+* **Example Dataset** – Load an example to guide new users or refresh memory.
+* **Data Reset** – Clear and replot new data without restarting the app.
 
 ---
 
-## 💻 User Interface
+## User Interface
 
 <img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/bc74e701-f0fd-479d-b202-957492c5a0cf" />
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🤝 Contributions
+## Contributions
 
 Contributions, suggestions, and bug reports are welcome! Feel free to fork the repository and submit a pull request.
-
----
-
-## 📬 Contact
-
-Made by [@NATRIST-0](https://github.com/NATRIST-0)
-For questions, improvements or feature requests, please open an issue on the [GitHub repository](https://github.com/NATRIST-0/DroiteReg).
