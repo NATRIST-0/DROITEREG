@@ -1,0 +1,8 @@
+__pycache__/
+.env
+*.pyc
+*.qrc
+*.ui
+*.ipynb_checkpoints
+add_ons/
+startup_profile

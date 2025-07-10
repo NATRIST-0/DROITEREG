@@ -1,1 +1,1 @@
-python -m PyQt6.uic.pyuic droitereg_ui.ui -o droitereg_ui.py
+python -m PyQt6.uic.pyuic ui_droitereg.ui -o ui_droitereg.py
