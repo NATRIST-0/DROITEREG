@@ -4,15 +4,25 @@ DROITEREG - Fonctions
 
 import os
 import io
+import sys
 import numpy as np
 from reportlab.lib import colors
 from PyQt6 import QtWidgets,QtCore
 from matplotlib.figure import Figure
-from PyQt6.QtWidgets import QFileDialog
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
+from PyQt6.QtWidgets import QFileDialog, QTableWidgetItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+
+def ressource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+def makeTableItem(value):
+    item = QTableWidgetItem(str(value))
+    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    return item
 
 def print(self):
     # Vérifier si le tableau est vide

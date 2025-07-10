@@ -1,27 +1,26 @@
 """
 DROITEREG - Main 
+
 """
 
 import os
 import sys
 import ressource
+from PyQt6 import QtGui
 from PyQt6 import QtCore
 from PyQt6.QtGui import QIcon
 import fonctions_droitereg as df
 from ui_droitereg import Ui_MainWindow
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
-def ressource_path(relative_path):
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui_main_window = Ui_MainWindow()
         self.ui_main_window.setupUi(self)
-        self.setWindowTitle("DROTIEREG")
-        self.setWindowIcon(QIcon(ressource_path('icon_droitereg.ico')))
+        self.setWindowTitle("DROITEREG")
+        self.setWindowIcon(QIcon(df.ressource_path('icon_droitereg.ico')))
 
         df.fillAdjustTableWidget(self.ui_main_window.tableWidget_data)
 
@@ -33,16 +32,41 @@ class Window(QMainWindow):
         self.ui_main_window.tableWidget_data.installEventFilter(self)
 
     def eventFilter(self, source, event):
-        if (source == self.ui_main_window.tableWidget_data and
-            event.type() == QtCore.QEvent.Type.KeyPress and 
-            event.key() in (QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter)):
-            
-            current = self.ui_main_window.tableWidget_data.currentIndex()
-            nextIndex = current.sibling(current.row() + 1, current.column())
-            if nextIndex.isValid():
-                self.ui_main_window.tableWidget_data.setCurrentIndex(nextIndex)
-                self.ui_main_window.tableWidget_data.edit(nextIndex)
-                return True  # événement traité
+        if source == self.ui_main_window.tableWidget_data:
+            # Entrée : aller à la cellule en dessous
+            if event.type() == QtCore.QEvent.Type.KeyPress:
+                if event.key() in (QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter):
+                    current = self.ui_main_window.tableWidget_data.currentIndex()
+                    nextIndex = current.sibling(current.row() + 1, current.column())
+                    if nextIndex.isValid():
+                        self.ui_main_window.tableWidget_data.setCurrentIndex(nextIndex)
+                        self.ui_main_window.tableWidget_data.edit(nextIndex)
+                        return True
+
+                # Coller (Ctrl+V)
+                if event.matches(QtGui.QKeySequence.StandardKey.Paste):
+                    clipboard = QApplication.clipboard()
+                    text = clipboard.text()
+                    rows = text.strip().splitlines()
+
+                    start_row = self.ui_main_window.tableWidget_data.currentRow()
+                    start_col = self.ui_main_window.tableWidget_data.currentColumn()
+
+                    for i, row in enumerate(rows):
+                        # On gère les séparateurs tabulation ou point-virgule
+                        columns = [c.strip() for c in row.split('\t')]
+                        if len(columns) == 1:
+                            columns = [c.strip() for c in row.split(';')]
+                        for j, cell in enumerate(columns):
+                            target_row = start_row + i
+                            target_col = start_col + j
+                            if (target_row < self.ui_main_window.tableWidget_data.rowCount() and
+                                target_col < self.ui_main_window.tableWidget_data.columnCount()):
+                                self.ui_main_window.tableWidget_data.setItem(
+                                    target_row, target_col,
+                                    df.makeTableItem(cell)
+                                )
+                    return True
 
         return super().eventFilter(source, event)
 
