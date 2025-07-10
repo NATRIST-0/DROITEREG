@@ -3,7 +3,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![PyQt6](https://img.shields.io/badge/UI-PyQt6-blueviolet)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey)
-![License](https://img.shields.io/github/license/NATRIST-0/DiluFlowCalc?cacheBust=1)
+![License](https://img.shields.io/github/license/NATRIST-0/DROITEREG)
 
 **DROITEREG** is a lightweight graphical application to help metrologists quickly process, convert, and visualize linear measurement data. The tool performs linear regression, computes associated errors, and generates a clean, professional PDF report for clients.
 
